@@ -25,6 +25,12 @@ class Agent:
         self.color = HSVToRGB([self.species,1,1])
         self.plotSize=plotSize
 
+        self.anomalous = rand() < 0.1
+        #self.anomalous = True
+        #self.anomalous = False
+        if self.anomalous:
+            self.color = [0,0,0]
+
         self.pltObj = plt.Circle(self.position, self.plotSize, color=self.color)
         
     
@@ -40,7 +46,6 @@ class Agent:
         elif self.position[0] > worldSize/2:
             self.position[0] -= worldSize
 
-
         if self.position[1] < -worldSize/2:
             self.position[1] += worldSize
 
@@ -53,11 +58,21 @@ class Agent:
 
 
     def updateVelocity(self, agents):
+        if self.anomalous:
+            weirdos = []
+            for a in agents:
+                if a.anomalous:
+                    weirdos.append(a.position)
+            com = np.mean(weirdos)/len(weirdos)
+
+            self.velocity = np.linalg.norm(self.velocity) * (com - self.position) / np.linalg.norm(com - self.position)
+            return
+
 
         herd_velocity = self.herdVelocity(agents)
 
         herd_magnitude = np.linalg.norm(herd_velocity)
-        self_magnitude = np.linalg.norm(self.velocity)
+        self_magnitude = np.linalg.norm(self.velocity) 
 
         if herd_magnitude > 0.1:
             

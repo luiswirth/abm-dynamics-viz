@@ -6,6 +6,11 @@ import matplotlib.colors as mcolors
 from agent import Agent
 from utils import HSVToRGB
 
+pos_file = open("res/pos.csv", "w+")
+
+# csv header
+pos_file.write("timestep,id,x,y\n")
+
 class World:
 
     def __init__(self,population=1,spawnSize=400,worldSize=1200,worldInterval=50,arrows=True,agentSize=3):
@@ -14,6 +19,9 @@ class World:
         self.figure, self.ax = plt.subplots(figsize=(12,8))
         self.ax.set_xlim(-worldSize/2, worldSize/2)
         self.ax.set_ylim(-worldSize/2, worldSize/2)
+
+        
+        self.istep = 0
 
         self.worldInterval = worldInterval
         self.worldSize = worldSize
@@ -41,11 +49,13 @@ class World:
 
         arrowSize = 3
 
-        for agent in self.agents:
+        for iagent, agent in enumerate(self.agents):
 
             agent.updatePosition(self.agents, self.worldSize)
             agent.pltObj.center = agent.position
             pltObjects.append(agent.pltObj)
+
+            pos_file.write(f"{self.istep},{iagent},{agent.position[0]},{agent.position[1]}\n")
 
             if self.arrows is True:
            
@@ -55,6 +65,8 @@ class World:
 
                 pltObjects.append(velocityArrow)
 
+        
+        self.istep += 1
         return pltObjects
 
 
